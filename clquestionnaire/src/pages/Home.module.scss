@@ -1,0 +1,12 @@
+.container {
+  height: calc(100vh - 64px - 68px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-image: linear-gradient(to top, #5ee7df 0%, #b490ca 100%);
+  button {
+    height: 60px;
+    font-size: 24px;
+  }
+}

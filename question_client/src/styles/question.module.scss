@@ -1,0 +1,14 @@
+.componentWrapper {
+  border: 1px solid #f1f1f1;
+}
+.submitBtn {
+  text-align: center;
+  margin: 16px;
+  button {
+    border: 1px solid transparent;
+    border-radius: 3px;
+    color: #fff;
+    background-color: #1677ff;
+    padding: 4px 15px;
+  }
+}

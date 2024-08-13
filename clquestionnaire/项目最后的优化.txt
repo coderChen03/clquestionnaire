@@ -1,0 +1,101 @@
+**分析代码体积**
+
+# Analyzing the Bundle Size
+
+[Source map explorer](https://www.npmjs.com/package/source-map-explorer) analyzes JavaScript bundles using the source maps. This helps you understand where code bloat is coming from.
+
+To add Source map explorer to a Create React App project, follow these steps:
+
+```sh
+npm install --save source-map-explorer
+```
+
+Copy
+
+Alternatively you may use `yarn`:
+
+```sh
+yarn add source-map-explorer
+```
+
+Copy
+
+Then in `package.json`, add the following line to `scripts`:
+
+```diff
+   "scripts": {
++    "analyze": "source-map-explorer 'build/static/js/*.js'",
+     "start": "react-scripts start",
+     "build": "react-scripts build",
+     "test": "react-scripts test",
+```
+
+Copy
+
+Then to analyze the bundle run the production build then run the analyze script.
+
+```sh
+npm run build
+npm run analyze
+```
+
+**路由懒加载**
+
+```react
+import React, { lazy } from "react";
+// 编辑页和统计页是在点击后才会去显示，利用（lazy）路由懒加载 优化首页体积
+const Edit = lazy(() => import(/* webpackChunkName:'editPage' */ "../pages/question/Edit"));
+const Statist = lazy(() => import(/* webpackChunkName:'statistPage' */ "../pages/question/Statist"));
+```
+
+**拆分公共代码**
+
+```json
+ //通过配置 webpack
+webpack: {
+    //缓存 固定版本的包
+    configure(webpackConfig) {
+      //只在生产环境才抽离公共代码
+      if (webpackConfig.mode === 'production') {
+        if (webpackConfig.optimization === null) {
+          webpackConfig.optimization = {}
+        }
+        webpackConfig.optimization.splitChunks = {
+          chunks: 'all',
+          cacheGroups: {
+            antd: {
+              name: 'antd-chunk',
+              test: /antd/,
+              priority: 100,
+            },
+            reactDom: {
+              name: 'reactDom-chunk',
+              test: /react-dom/,
+              priority: 99,
+            },
+            // vendors:供应商 (一般表示第三方库)
+            vendors: {
+              name: 'vendors-chunk',
+              test: /node_modules/,
+              priority: 98,
+            }
+          }
+        }
+      }
+      return webpackConfig
+    }
+  },
+```
+
+**css拆分**
+
+```react
+//懒加载组件时，webpack也会自动帮我们为css分块
+const Edit = lazy(() => import(/* webpackChunkName:'editPage' */ "../pages/question/Edit"));
+const Statist = lazy(() => import(/* webpackChunkName:'statistPage' */ "../pages/question/Statist"));
+
+  1.22 kB             build\static\css\main.34151c8f.css
+  865 B               build\static\css\editPage.170644e1.chunk.css
+  586 B               build\static\css\statistPage.a9025489.chunk.css
+```
+
